@@ -1,11 +1,12 @@
-import { useState, useEffect, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
+import {useState, useEffect, useRef} from 'react';
+import {useNavigate} from 'react-router-dom';
 import Button from '@components/Button';
 import DevicePreview from './DevicePreview';
 import DeviceStatusList from './DeviceStatusList';
 import InterviewTips from './InterviewTips';
 
-const API_BASE = 'REDACTED';
+// src/pages/Interview/InterviewPrepare/index.jsx
+const API_BASE = process.env.REACT_APP_API_BASE;
 
 export default function InterviewPrepare() {
   const navigate = useNavigate();
@@ -13,16 +14,17 @@ export default function InterviewPrepare() {
 
   // 장비 상태 통합 관리
   const [deviceStatus, setDeviceStatus] = useState({
-    cameraReady: false, cameraError: false,
-    micReady: false, micError: false,
-    isCheckingDevices: true
+    cameraReady: false,
+    cameraError: false,
+    micReady: false,
+    micError: false,
+    isCheckingDevices: true,
   });
-
 
   // 인터뷰 시작 요청
   useEffect(() => {
     const checkDevices = async () => {
-      setDeviceStatus(prev => ({ ...prev, isCheckingDevices: true }));
+      setDeviceStatus((prev) => ({...prev, isCheckingDevices: true}));
 
       try {
         // 카메라 체크
@@ -32,22 +34,30 @@ export default function InterviewPrepare() {
         if (videoRef.current) {
           videoRef.current.srcObject = videoStream;
         }
-        setDeviceStatus(prev => ({ ...prev, cameraReady: true, cameraError: false }));
+        setDeviceStatus((prev) => ({
+          ...prev,
+          cameraReady: true,
+          cameraError: false,
+        }));
       } catch (err) {
         console.error('Camera access error:', err);
-        setDeviceStatus(prev => ({ ...prev, cameraReady: false, cameraError: true }));
+        setDeviceStatus((prev) => ({
+          ...prev,
+          cameraReady: false,
+          cameraError: true,
+        }));
       }
 
       try {
         // 마이크는 "권한만 요청"
         await navigator.mediaDevices.getUserMedia({audio: true});
-        setDeviceStatus(prev => ({ ...prev, micReady: true, micError: false }));
+        setDeviceStatus((prev) => ({...prev, micReady: true, micError: false}));
       } catch (err) {
         console.error('Microphone access error:', err);
-        setDeviceStatus(prev => ({ ...prev, micReady: false, micError: true }));
+        setDeviceStatus((prev) => ({...prev, micReady: false, micError: true}));
       }
 
-      setDeviceStatus(prev => ({ ...prev, isCheckingDevices: false }));
+      setDeviceStatus((prev) => ({...prev, isCheckingDevices: false}));
     };
 
     checkDevices();
@@ -96,14 +106,18 @@ export default function InterviewPrepare() {
   return (
     <div className='min-h-screen max-w-4xl mx-auto px-6 py-15'>
       <header className='text-center mb-12'>
-        <h1 className='text-3xl font-bold text-blue mb-4'>면접을 시작하기 전에</h1>
-        <p className='text-gray-600 font-semibold'>삼성물산 패션부문 / 상품기획(MD) 신입 면접 준비 중</p>
+        <h1 className='text-3xl font-bold text-blue mb-4'>
+          면접을 시작하기 전에
+        </h1>
+        <p className='text-gray-600 font-semibold'>
+          삼성물산 패션부문 / 상품기획(MD) 신입 면접 준비 중
+        </p>
       </header>
 
-      <DevicePreview 
-        cameraReady={deviceStatus.cameraReady} 
-        cameraError={deviceStatus.cameraError} 
-        isCheckingDevices={deviceStatus.isCheckingDevices} 
+      <DevicePreview
+        cameraReady={deviceStatus.cameraReady}
+        cameraError={deviceStatus.cameraError}
+        isCheckingDevices={deviceStatus.isCheckingDevices}
       />
 
       <DeviceStatusList states={deviceStatus} />
@@ -111,12 +125,13 @@ export default function InterviewPrepare() {
       <InterviewTips />
 
       <footer className='flex justify-between items-center mt-10'>
-        <Button variant='ghost' onClick={() => navigate(-1)}>이전</Button>
-        <Button 
-          variant='primary' 
-          onClick={handleStartInterview} 
-          disabled={!deviceStatus.cameraReady || !deviceStatus.micReady}
-        >
+        <Button variant='ghost' onClick={() => navigate(-1)}>
+          이전
+        </Button>
+        <Button
+          variant='primary'
+          onClick={handleStartInterview}
+          disabled={!deviceStatus.cameraReady || !deviceStatus.micReady}>
           {deviceStatus.isCheckingDevices ? '준비 중...' : '면접 시작하기'}
         </Button>
       </footer>
