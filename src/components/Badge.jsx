@@ -1,0 +1,18 @@
+const Badge = ({children, classname = '', variant = 'ghost'}) => {
+  const variants = {
+    primary: 'bg-primary text-white rounded-full py-2 text-sm',
+    ghost: 'text-black rounded-lg py-1 text-sm',
+    secondary:
+      'px-2.5 py-1 rounded-lg bg-blue-50 text-blue-600 text-xs font-medium',
+    tertiary: 'px-2.5 py-1 bg-[#c0f7d4] text-green text-sm font-medium rounded-full border-green',
+    plain: ''
+  };
+  return (
+    <div
+      className={`${classname} ${variants[variant]} inline-flex items-center border-none text-center`}>
+      {children}
+    </div>
+  );
+};
+
+export default Badge;
